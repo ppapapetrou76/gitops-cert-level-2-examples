@@ -21,7 +21,7 @@ spec:
       source:
         repoURL: 'https://github.com/ppapapetrou76/gitops-certification-examples'
         targetRevision: '{{.head_sha}}'
-        path: helm-apps/simple-chart
+        path: ./helm-apps/simple-chart
         helm:
           parameters:
             - name: "image.tag"
