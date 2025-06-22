@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: lodge-stage-preview
+  namespace: codefresh
+spec:
+  goTemplate: true
+  generators:
+    - pullRequest:
+        github:
+          # The GitHub organization or user.
+          owner: ppapapetrou76
+          # The Github repository
+          repo: gitops-certification-examples
+          labels:
+            - preview
+        requeueAfterSeconds: 1800
+  template:
+    metadata:
+      name: 'myapp-{{.branch}}-{{.number}}'
+    spec:
+      source:
+        repoURL: 'https://github.com/ppapapetrou76/gitops-certification-examples'
+        targetRevision: '{{.head_sha}}'
+        path: helm-apps/simple-chart
+        helm:
+          parameters:
+            - name: "image.tag"
+              value: "pull-{{.author}}-{{.head_sha}}"
+      project: "my-project"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: default
