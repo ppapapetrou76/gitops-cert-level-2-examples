@@ -9,20 +9,26 @@ spec:
         github:
           owner: ppapapetrou76
           repo: gitops-certification-examples
-        requeueAfterSeconds: 20
+          labels:
+            - preview
   template:
     metadata:
-      name: 'myapp-{{.branch}}-{{.number}}'
+      name: 'myapp-{{ .branch }}-{{ .number }}'
+      labels:
+        key1: '{{ index .labels 0 }}'
     spec:
       source:
-        repoURL: 'https://github.com/ppapapetrou76/gitops-certification-examples'
-        targetRevision: '{{.head_sha}}'
-        path: ./helm-apps/simple-chart
+        repoURL: 'https://github.com/ppapapetrou76/gitops-certification-examples.git'
+        targetRevision: '{{ .head_sha }}'
+        path: helm-apps/simple-chart
         helm:
           parameters:
             - name: "image.tag"
-              value: "pull-{{.author}}-{{.head_sha}}"
-      project: "my-project"
+              value: "pull-{{ .head_sha }}"
+      project: default
       destination:
         server: https://kubernetes.default.svc
-        namespace: default
+        namespace: "{{ .branch }}-{{ .number }}"
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
