@@ -20,8 +20,10 @@ spec:
                 labels:
                   - preview
                 owner: ppapapetrou76
-                appSecretName: TOKEN_SECRET
                 repo: gitops-certification-examples
+                tokenRef:
+                  secretName:
+                  key: token
               requeueAfterSeconds: 20
   template:
     metadata:
