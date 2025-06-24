@@ -15,18 +15,12 @@ spec:
               revision: HEAD
               values:
                 appName: "{{index .path.segments 1 }}"
-                # If a repo has a different name than the EKS namespace
-                # we'll need to add that mapping here.
-                repository: '{{- if eq (index .path.segments 1) "marketplace"
-              -}}marketplace-eks{{- else if eq (index .path.segments 1)
-              "identity" -}}identity.nerdwallet{{- else -}}{{ index
-              .path.segments 1 }}{{- end }}'
           - pullRequest:
               github:
                 labels:
                   - preview
                 owner: ppapapetrou76
-                repo: '{{ .values.repository }}'
+                repo: gitops-certification-examples
               requeueAfterSeconds: 20
   template:
     metadata:
