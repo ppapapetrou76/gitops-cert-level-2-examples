@@ -13,6 +13,9 @@ spec:
                 - path: apps/*/stage
               repoURL: https://github.com/ppapapetrou76/many-charts.git
               revision: HEAD
+              tokenRef:
+                secretName: PAT_SECRET
+                key: token
               values:
                 appName: "{{index .path.segments 1 }}"
           - pullRequest:
