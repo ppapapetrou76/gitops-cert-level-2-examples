@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: test-matrix-pr-many-charts
+  name: lodge-stage-preview
   namespace: argocd
 spec:
   goTemplate: true
@@ -21,9 +21,6 @@ spec:
                   - preview
                 owner: ppapapetrou76
                 repo: gitops-certification-examples
-                tokenRef:
-                  secretName:
-                  key: token
               requeueAfterSeconds: 20
   template:
     metadata:
