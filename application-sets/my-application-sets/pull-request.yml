@@ -25,9 +25,16 @@ spec:
   template:
     metadata:
       labels:
-        app: '{{ index .path.segments 1 }}'
-        environment: '{{ index .path.segments 2 }}'
-      name: '{{ index .path.segments 1 }}-{{ index .path.segments 2 }}'
+        # app and environment are used for ArgoCD notifications
+        app: '{{ .values.appName }}'
+        environment: "stage"
+      annotations:
+        argocd.argoproj.io/manifest-generate-paths: 'apps/{{ .values.appName }}/stage'
+        notifications.argoproj.io/subscribe.preview-deploys.github: ""
+        github_repo: '{{ .values.repository }}'
+        pr_head_sha: '{{ .head_sha }}'
+        pr_number: '{{ .number }}'
+      name: '{{ .values.appName }}--pr-{{ .number }}'
     spec:
       # The project the application belongs to.
       project: default
