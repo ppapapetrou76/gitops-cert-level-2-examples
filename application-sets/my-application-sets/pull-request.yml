@@ -10,17 +10,23 @@ spec:
         generators:
           - git:
               directories:
-                - path: apps/*/stage
+                - path: apps/*/stage/preview
               repoURL: https://github.com/ppapapetrou76/many-charts.git
               revision: HEAD
               values:
                 appName: "{{index .path.segments 1 }}"
+                # If a repo has a different name than the EKS namespace
+                # we'll need to add that mapping here.
+                repository: '{{- if eq (index .path.segments 1) "third"
+                  -}}gitops-certification-examples{{- else if eq (index .path.segments 1)
+                  "identity" -}}identity.nerdwallet{{- else -}}{{ index
+                  .path.segments 1 }}{{- end }}'
           - pullRequest:
               github:
                 labels:
                   - preview
                 owner: ppapapetrou76
-                repo: gitops-certification-examples
+                repo: '{{ .values.repository }}'
               requeueAfterSeconds: 20
   template:
     metadata:
