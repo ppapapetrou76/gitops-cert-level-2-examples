@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: lodge-stage-preview
-  namespace: argocd
+  namespace: codefresh
 spec:
   goTemplate: true
   generators:
