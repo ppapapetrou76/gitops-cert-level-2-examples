@@ -19,7 +19,7 @@ spec:
                 # we'll need to add that mapping here.
                 repository: '{{- if eq (index .path.segments 1) "third"
                   -}}gitops-certification-examples{{- else if eq (index .path.segments 1)
-                  "identity" -}}identity.nerdwallet{{- else -}}{{ index
+                  "ninth" -}}gitops-certification-examples{{- else -}}{{ index
                   .path.segments 1 }}{{- end }}'
           - pullRequest:
               github:
