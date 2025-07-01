@@ -1,34 +1,88 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: application-set-testing
+  name: lodge-stage-preview
+  namespace: codefresh
 spec:
   goTemplate: true
   generators:
-    - pullRequest:
-        github:
-          owner: ppapapetrou76
-          repo: gitops-certification-examples
-          labels:
-            - preview
+    - matrix:
+        generators:
+          - git:
+              directories:
+                - path: apps/*/stage/preview
+              repoURL: https://github.com/ppapapetrou76/many-charts.git
+              revision: HEAD
+              values:
+                appName: "{{index .path.segments 1 }}"
+                # If a repo has a different name than the EKS namespace
+                # we'll need to add that mapping here.
+                repository: '{{- if eq (index .path.segments 1) "third"
+                  -}}gitops-certification-examples{{- else if eq (index .path.segments 1)
+                  "ninth" -}}gitops-certification-examples{{- else -}}{{ index
+                  .path.segments 1 }}{{- end }}'
+          - pullRequest:
+              github:
+                labels:
+                  - preview
+                owner: ppapapetrou76
+                repo: '{{ .values.repository }}'
+              requeueAfterSeconds: 20
   template:
     metadata:
-      name: 'myapp-{{ .branch }}-{{ .number }}'
       labels:
-        key1: '{{ index .labels 0 }}'
+        # app and environment are used for ArgoCD notifications
+        app: '{{ .values.appName }}'
+        environment: "stage"
+      annotations:
+        argocd.argoproj.io/manifest-generate-paths: 'apps/{{ .values.appName }}/stage'
+        notifications.argoproj.io/subscribe.preview-deploys.github: ""
+        github_repo: '{{ .values.repository }}'
+        pr_head_sha: '{{ .head_sha }}'
+        pr_number: '{{ .number }}'
+      name: '{{ .values.appName }}--pr-{{ .number }}'
     spec:
+      # The project the application belongs to.
+      project: default
+
+      # Source of the application manifests
       source:
-        repoURL: 'https://github.com/ppapapetrou76/gitops-certification-examples.git'
-        targetRevision: '{{ .head_sha }}'
-        path: helm-apps/simple-chart
         helm:
           parameters:
-            - name: "image.tag"
-              value: "pull-{{ .head_sha }}"
-      project: default
+            - name: argocdAppName
+              value: $ARGOCD_APP_NAME
+            - name: global.environment
+              value: stage
+            - name: global.cluster.name
+              value: apps
+            - name: global.cluster.region
+              value: us-east-1
+        path: '{{ .path.path }}'
+        repoURL: https://github.com/ppapapetrou76/many-charts.git
+
+      # Destination cluster and namespace to deploy the application
       destination:
         server: https://kubernetes.default.svc
-        namespace: "{{ .branch }}-{{ .number }}"
+        namespace: '{{ index .path.segments 1 }}'
+
+      ignoreDifferences:
+        - group: apps
+          jqPathExpressions:
+            - .spec.template.metadata.annotations?["kubectl.kubernetes.io/restartedAt"]
+              // empty
+          kind: '*'
+
+      # Sync policy
       syncPolicy:
         syncOptions:
           - CreateNamespace=true
+          - PrunePropagationPolicy=foreground
+          - Replace=false
+          - PruneLast=false
+          - Validate=true
+          - ApplyOutOfSyncOnly=false
+          - PreserveResourcesOnDeletion=true
+          - RespectIgnoreDifferences=true
+        automated: # automated sync by default retries failed attempts 5 times with following delays between attempts ( 5s, 10s, 20s, 40s, 80s ); retry controlled using `retry` field.
+          prune: true # Specifies if resources should be pruned during auto-syncing ( false by default ).
+          selfHeal: true # Specifies if partial app sync should be executed when resources are changed only in target Kubernetes cluster and no git change detected ( false by default ).
