@@ -21,4 +21,4 @@ spec:
           - "sleep"
           - "60"
         ports:
-        - containerPort: 8090
+        - containerPort: 8080
