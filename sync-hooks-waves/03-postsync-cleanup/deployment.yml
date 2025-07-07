@@ -19,6 +19,6 @@ spec:
         image: docker.io/kostiscodefresh/gitops-simple-app:v1.0
         command:
           - "sleep"
-          - "30"
+          - "60"
         ports:
         - containerPort: 8090
