@@ -5,7 +5,7 @@ metadata:
   name: simple-deployment
   namespace: example03
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: trivial-go-web-app
@@ -15,12 +15,10 @@ spec:
         app: trivial-go-web-app
     spec:
       containers:
-      - name: dummy-run
-        image: alpine
+      - name: webserver-simple
+        image: docker.io/kostiscodefresh/gitops-simple-app:v1.0
         command:
           - "sleep"
           - "30"
-      - name: webserver-simple
-        image: docker.io/kostiscodefresh/gitops-simple-app:v1.0
         ports:
         - containerPort: 8090
