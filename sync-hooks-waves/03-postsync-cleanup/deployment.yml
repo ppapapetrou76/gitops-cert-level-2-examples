@@ -18,7 +18,7 @@ spec:
       - name: webserver-simple
         image: docker.io/kostiscodefresh/gitops-simple-app:v1.0
         ports:
-        - containerPort: 8008
+        - containerPort: 8080
       - name: dummy-run
         image: alpine
         command:
