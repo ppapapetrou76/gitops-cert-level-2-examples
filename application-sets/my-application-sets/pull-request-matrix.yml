@@ -30,7 +30,7 @@ spec:
                 tokenRef:
                   secretName: github-token
                   key: token
-              requeueAfterSeconds: 5
+              requeueAfterSeconds: 20
   template:
     metadata:
       labels:
