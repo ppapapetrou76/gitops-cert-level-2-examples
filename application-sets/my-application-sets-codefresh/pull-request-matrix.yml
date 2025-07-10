@@ -27,7 +27,10 @@ spec:
                   - preview
                 owner: ppapapetrou76
                 repo: '{{ .values.repository }}'
-              requeueAfterSeconds: 20
+                tokenRef:
+                  secretName: github-token
+                  key: token
+              requeueAfterSeconds: 5
   template:
     metadata:
       labels:
