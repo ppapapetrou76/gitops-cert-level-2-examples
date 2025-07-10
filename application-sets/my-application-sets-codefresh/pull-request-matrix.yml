@@ -20,6 +20,7 @@ spec:
                 repository: '{{- if eq (index .path.segments 1) "third"
                   -}}gitops-certification-examples{{- else if eq (index .path.segments 1)
                   "ninth" -}}gitops-certification-examples{{- else if eq (index .path.segments 1)
+                  "hundred" -}}gitops-cert-level-3-examples{{- else if eq (index .path.segments 1)
                   "first" -}}gitops-certification-examples{{- else -}}gitops-certification-examples{{- end }}'
           - pullRequest:
               github:
